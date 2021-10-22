@@ -15,6 +15,10 @@ class AWSAPI {
       "userName": name,
     });
   }
+
+  static String createSendMessageRequest(String message) {
+    return jsonEncode({"action": "message", "message": message});
+  }
 }
 
 /*

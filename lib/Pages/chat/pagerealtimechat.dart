@@ -1,7 +1,7 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import 'dart:convert';
-
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:ggez/Pages/API/api.dart';
 import 'package:ggez/Pages/chat/chatlobby.dart';
@@ -18,11 +18,27 @@ class PageRealTime extends StatefulWidget {
 class _PageRealTimeState extends State<PageRealTime> {
   TextEditingController? displayname;
 
+  //for navigation
+  bool navigate = false;
+  int roomNumber = -1;
+  String userName = '';
+
   @override
   void initState() {
-    displayname = TextEditingController();
     super.initState();
+    displayname = TextEditingController();
     Provider.of<MainProvider>(context, listen: false).connect();
+    Provider.of<MainProvider>(context, listen: false)
+        .getStream()
+        .listen((data) {
+      print("NOTOSNDOAKSNd");
+    });
+  }
+
+  @override
+  void dispose() {
+    Provider.of<MainProvider>(context, listen: false).closeWS();
+    super.dispose();
   }
 
   @override
@@ -47,37 +63,6 @@ class _PageRealTimeState extends State<PageRealTime> {
                   AWSAPI.createRoomRequest(displayName: displayname!.text));
             },
             child: Text("Create Room and join")),
-        StreamBuilder(
-          builder: (context, snapshot) {
-            if (snapshot.hasData == false) {
-              return Container();
-            } else {
-              try {
-                var resp = jsonDecode(snapshot.data.toString());
-                var status = resp['status code'];
-                if (status == 200) {
-                  //Push on success
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            PageChatLobby(resp['roomNumber'], resp['userName']),
-                      ));
-
-                  return Text("Show login page now");
-                }
-              } on Exception {
-                try {
-                  return Text(snapshot.data.toString() + " conv fail");
-                } on Exception {
-                  return Container();
-                }
-              }
-              return Text(snapshot.data.toString() + " last");
-            }
-          },
-          stream: Provider.of<MainProvider>(context, listen: false).getStream(),
-        )
       ],
     ));
   }

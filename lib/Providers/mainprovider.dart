@@ -18,4 +18,8 @@ class MainProvider with ChangeNotifier {
   Stream getStream() {
     return _ws!.stream;
   }
+
+  void closeWS() {
+    _ws!.sink.close();
+  }
 }
