@@ -1,9 +1,9 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
-import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:ggez/Pages/API/api.dart';
+import 'package:ggez/Pages/Models/model_createroom_resp.dart';
 import 'package:ggez/Pages/chat/chatlobby.dart';
 import 'package:ggez/Providers/mainprovider.dart';
 import 'package:provider/provider.dart';
@@ -19,8 +19,7 @@ class _PageRealTimeState extends State<PageRealTime> {
   TextEditingController? displayname;
 
   //for navigation
-  bool navigate = false;
-  int roomNumber = -1;
+  var roomNumber = -1;
   String userName = '';
 
   @override
@@ -28,15 +27,6 @@ class _PageRealTimeState extends State<PageRealTime> {
     super.initState();
     displayname = TextEditingController();
     Provider.of<MainProvider>(context, listen: false).connect();
-    WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
-      // if (navigate == true) {
-      //   Navigator.push(
-      //       context,
-      //       MaterialPageRoute(
-      //         builder: (context) => PageChatLobby(roomNumber, userName),
-      //       ));
-      // }
-    });
   }
 
   @override
@@ -58,13 +48,12 @@ class _PageRealTimeState extends State<PageRealTime> {
           }
 
           if (hasData) {
-            var parsedData = jsonDecode(snapshot.data.toString());
-
-            int statusCode = parsedData['status code'] as int;
-            if (statusCode == 200) {
-              roomNumber = parsedData['roomNumber'];
-              userName = parsedData['userName'];
-              navigate = true;
+            ModelCreateRoomResp createRoomResp =
+                API.parseCreateRoomRequestResponse(snapshot.data.toString());
+            if (createRoomResp.statusCode == 200) {
+              roomNumber = createRoomResp.roomNumber;
+              userName = createRoomResp.userName;
+              _startNavigation();
               return Text("Loading");
             } else {
               return Text("Error loading");
@@ -72,8 +61,8 @@ class _PageRealTimeState extends State<PageRealTime> {
           } else {
             return TextButton(
                 onPressed: () {
-                  Provider.of<MainProvider>(context, listen: false).sendData(
-                      AWSAPI.createRoomRequest(displayName: "Kuchuk"));
+                  Provider.of<MainProvider>(context, listen: false)
+                      .sendData(API.createRoomRequest(displayName: "Kuchuk"));
                 },
                 child: Text("No data create now"));
           }
@@ -81,5 +70,15 @@ class _PageRealTimeState extends State<PageRealTime> {
         stream: Provider.of<MainProvider>(context, listen: false).getStream(),
       ),
     );
+  }
+
+  _startNavigation() async {
+    await Future.delayed(Duration.zero);
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PageChatLobby(roomNumber, userName),
+        ),
+        (route) => false);
   }
 }

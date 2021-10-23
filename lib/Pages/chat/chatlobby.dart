@@ -26,7 +26,34 @@ class _PageChatLobbyState extends State<PageChatLobby> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: Text("Chat page"));
+    return Scaffold(
+        body: Column(
+      children: [
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: List.generate(getConnectedUsers().length, (index) {
+              if (index == 0) {
+                return Text(
+                    "Users in lobby : " + getConnectedUsers()[index] + ", ");
+              } else if (index == (getConnectedUsers().length - 1)) {
+                return Text(getConnectedUsers()[index]);
+              } else {
+                return Text(getConnectedUsers()[index] + ", ");
+              }
+            }),
+          ),
+        ),
+        TextFormField(
+          controller: messageTC,
+          decoration: InputDecoration(hintText: "Message"),
+          onChanged: (value) {
+            Provider.of<MainProvider>(context, listen: false)
+                .sendData(API.createSendMessageRequest(value));
+          },
+        ),
+      ],
+    ));
   }
 
   List<String> getConnectedUsers() {

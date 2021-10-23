@@ -8,7 +8,7 @@ class MainProvider with ChangeNotifier {
   WebSocketChannel? _ws;
 
   void connect({int roomID = -1}) async {
-    _ws = WebSocketChannel.connect(Uri.parse(AWSAPI.wsUrl));
+    _ws = WebSocketChannel.connect(Uri.parse(API.wsUrl));
   }
 
   void sendData(var data) {
