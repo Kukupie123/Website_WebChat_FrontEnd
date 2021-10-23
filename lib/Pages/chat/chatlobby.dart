@@ -20,42 +20,13 @@ class _PageChatLobbyState extends State<PageChatLobby> {
 
   @override
   void initState() {
-    messageTC = TextEditingController();
     super.initState();
+    messageTC = TextEditingController();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        children: [
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: List.generate(getConnectedUsers().length,
-                  (index) => Text(getConnectedUsers()[index])),
-            ),
-          ),
-          TextFormField(
-            controller: messageTC,
-            decoration: InputDecoration(hintText: "Message"),
-          ),
-          TextButton(
-            onPressed: () {
-              if (messageTC!.text.isEmpty) return;
-              Provider.of<MainProvider>(context, listen: false)
-                  .sendData(AWSAPI.createSendMessageRequest(messageTC!.text));
-            },
-            child: Text("SEND"),
-          ),
-          StreamBuilder(
-            builder: (context, snapshot) => Text(snapshot.data.toString()),
-            stream:
-                Provider.of<MainProvider>(context, listen: false).getStream(),
-          )
-        ],
-      ),
-    );
+    return Scaffold(body: Text("Chat page"));
   }
 
   List<String> getConnectedUsers() {

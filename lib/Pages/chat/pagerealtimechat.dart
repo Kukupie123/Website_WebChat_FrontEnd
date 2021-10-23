@@ -28,42 +28,58 @@ class _PageRealTimeState extends State<PageRealTime> {
     super.initState();
     displayname = TextEditingController();
     Provider.of<MainProvider>(context, listen: false).connect();
-    Provider.of<MainProvider>(context, listen: false)
-        .getStream()
-        .listen((data) {
-      print("NOTOSNDOAKSNd");
+    WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
+      // if (navigate == true) {
+      //   Navigator.push(
+      //       context,
+      //       MaterialPageRoute(
+      //         builder: (context) => PageChatLobby(roomNumber, userName),
+      //       ));
+      // }
     });
   }
 
   @override
   void dispose() {
-    Provider.of<MainProvider>(context, listen: false).closeWS();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.start,
-      mainAxisSize: MainAxisSize.max,
-      children: [
-        TextField(
-          decoration: InputDecoration(hintText: "Room ID to connect to"),
-        ),
-        TextButton(onPressed: () {}, child: Text("Join room")),
-        TextField(
-          controller: displayname,
-          decoration: InputDecoration(hintText: "Display name"),
-        ),
-        TextButton(
-            onPressed: () {
-              Provider.of<MainProvider>(context, listen: false).sendData(
-                  AWSAPI.createRoomRequest(displayName: displayname!.text));
-            },
-            child: Text("Create Room and join")),
-      ],
-    ));
+      body: StreamBuilder(
+        builder: (context, snapshot) {
+          bool hasData = false;
+          if (snapshot.data != null) {
+            if (snapshot.hasData) {
+              //IF DATA IS VALID
+              hasData = true;
+            }
+          }
+
+          if (hasData) {
+            var parsedData = jsonDecode(snapshot.data.toString());
+
+            int statusCode = parsedData['status code'] as int;
+            if (statusCode == 200) {
+              roomNumber = parsedData['roomNumber'];
+              userName = parsedData['userName'];
+              navigate = true;
+              return Text("Loading");
+            } else {
+              return Text("Error loading");
+            }
+          } else {
+            return TextButton(
+                onPressed: () {
+                  Provider.of<MainProvider>(context, listen: false).sendData(
+                      AWSAPI.createRoomRequest(displayName: "Kuchuk"));
+                },
+                child: Text("No data create now"));
+          }
+        },
+        stream: Provider.of<MainProvider>(context, listen: false).getStream(),
+      ),
+    );
   }
 }
