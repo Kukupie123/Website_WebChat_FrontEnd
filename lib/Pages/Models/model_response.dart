@@ -31,25 +31,29 @@ class ModelMessageResp extends _ModelBaseResp {
 }
 
 class ModelParser {
-  static Map<ResponseEventType, _ModelBaseResp>? getCorrect(String response) {
-    var data = jsonDecode(response);
-    String eventType = data['event'];
-    switch (eventType) {
-      case "messageEvent":
-        ModelMessageResp _modelMessageResp = ModelMessageResp(
-            data['message'], data['senderName'], data['event']);
-        return {ResponseEventType.MessageEvent: _modelMessageResp};
-      case "createRoomEvent":
-        ModelCreateRoomResp _modelCreateRoomResp = ModelCreateRoomResp(
-            data['userName'],
-            data["roomNumber"],
-            data["statusCode"],
-            data["event"]);
-        return {ResponseEventType.CreateRoomEvent: _modelCreateRoomResp};
-      case "joinedRoomEvent":
-        return null;
+  static Map<ResponseEventType, _ModelBaseResp?>? getCorrect(String response) {
+    try {
+      var data = jsonDecode(response);
+      String eventType = data['event'];
+      switch (eventType) {
+        case "messageEvent":
+          ModelMessageResp _modelMessageResp = ModelMessageResp(
+              data['message'], data['senderName'], data['event']);
+          return {ResponseEventType.MessageEvent: _modelMessageResp};
+        case "createRoomEvent":
+          ModelCreateRoomResp _modelCreateRoomResp = ModelCreateRoomResp(
+              data['userName'],
+              data["roomNumber"],
+              data["status code"],
+              data["event"]);
+          return {ResponseEventType.CreateRoomEvent: _modelCreateRoomResp};
+        case "joinedRoomEvent":
+          return {ResponseEventType.Null: null};
+      }
+    } on Exception {
+      return {ResponseEventType.Null: null};
     }
   }
 }
 
-enum ResponseEventType { MessageEvent, CreateRoomEvent, JoinedRoomEvent }
+enum ResponseEventType { MessageEvent, CreateRoomEvent, JoinedRoomEvent, Null }

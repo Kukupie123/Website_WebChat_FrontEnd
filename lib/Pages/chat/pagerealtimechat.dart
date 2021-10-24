@@ -1,7 +1,6 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -45,14 +44,10 @@ class _PageRealTimeState extends State<PageRealTime> {
       body: StreamBuilder(
         builder: (context, snapshot) {
           bool hasData = false;
-          if (snapshot.data != null) {
-            if (snapshot.hasData) {
-              //IF DATA IS VALID
-              hasData = true;
-            }
-          }
+          print(snapshot.data.toString());
 
-          if (hasData) {
+
+          if (snapshot.hasData) {
             //sending the data to get parsed and send us a Map<event,ModelResponse> accordingly
             var resp = ModelParser.getCorrect(snapshot.data.toString());
 
