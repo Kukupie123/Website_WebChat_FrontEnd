@@ -46,23 +46,26 @@ class _PageRealTimeState extends State<PageRealTime> {
           bool hasData = false;
           print(snapshot.data.toString());
 
-
           if (snapshot.hasData) {
             //sending the data to get parsed and send us a Map<event,ModelResponse> accordingly
             var resp = ModelParser.getCorrect(snapshot.data.toString());
 
             //Checking if the response we got is of CreateRoomEvent
             if (resp!.containsKey(ResponseEventType.CreateRoomEvent)) {
-              var responseModel = resp[ResponseEventType.CreateRoomEvent]
-                  as ModelCreateRoomResp;
+              if (resp[ResponseEventType.CreateRoomEvent] != null) {
+                var responseModel = resp[ResponseEventType.CreateRoomEvent]
+                    as ModelCreateRoomResp;
 
-              if (responseModel.statusCode == 200) {
-                roomNumber = responseModel.roomNumber;
-                userName = responseModel.userName;
-                _startNavigation();
-                return Text("Loading");
+                if (responseModel.statusCode == 200) {
+                  roomNumber = responseModel.roomNumber;
+                  userName = responseModel.userName;
+                  _startNavigation();
+                  return Text("Loading");
+                } else {
+                  return Text("Error loading");
+                }
               } else {
-                return Text("Error loading");
+                return Text(snapshot.data.toString());
               }
             } else {
               return Text(snapshot.data.toString());

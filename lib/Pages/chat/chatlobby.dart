@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:ggez/Pages/API/api.dart';
 import 'package:ggez/Pages/Models/model_response.dart';
 import 'package:ggez/Providers/mainprovider.dart';
-import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 
 class PageChatLobby extends StatefulWidget {
@@ -66,13 +65,18 @@ class _PageChatLobbyState extends State<PageChatLobby> {
             if (hasData) {
               var respMapped = ModelParser.getCorrect(snapshot.data.toString());
               if (respMapped!.containsKey(ResponseEventType.MessageEvent)) {
-                var messageRespModel =
-                    respMapped[ResponseEventType.MessageEvent]
-                        as ModelMessageResp;
-                return Text(
-                    messageRespModel.sender + " : " + messageRespModel.message);
+                if (respMapped[ResponseEventType.MessageEvent] != null) {
+                  var messageRespModel =
+                      respMapped[ResponseEventType.MessageEvent]
+                          as ModelMessageResp;
+                  return Text(messageRespModel.sender +
+                      " : " +
+                      messageRespModel.message);
+                } else {
+                  return Text("xxxxx");
+                }
               } else {
-                return Text("xxxxxx");
+                return Text("Stoxx");
               }
             } else {
               return Text(".....");
