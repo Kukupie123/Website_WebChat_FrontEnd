@@ -5,6 +5,7 @@ import 'package:ggez/Pages/chat/pagerealtimechat.dart';
 import 'package:ggez/Providers/mainprovider.dart';
 import 'package:provider/provider.dart';
 
+
 void main() {
   runApp(const MyApp());
 }
@@ -18,11 +19,10 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (_) => MainProvider(),
       builder: (context, child) => MaterialApp(
-        title: 'Flutter Demo',
         theme: ThemeData(
-          primarySwatch: Colors.blue,
+          primarySwatch: Colors.blueGrey,
         ),
-        home:  PageRealTime(),
+        home: PageChatHome()
       ),
     );
   }
