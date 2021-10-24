@@ -2,7 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:ggez/Pages/API/api.dart';
+import 'package:ggez/Pages/Models/model_response.dart';
 import 'package:ggez/Providers/mainprovider.dart';
+import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 
 class PageChatLobby extends StatefulWidget {
@@ -49,8 +51,36 @@ class _PageChatLobbyState extends State<PageChatLobby> {
           decoration: InputDecoration(hintText: "Message"),
           onChanged: (value) {
             Provider.of<MainProvider>(context, listen: false)
-                .sendData(API.createSendMessageRequest(value));
+                .sendData(API.getCreateSendMessageRequest(messageTC!.text));
           },
+        ),
+        StreamBuilder(
+          builder: (context, snapshot) {
+            bool hasData = false;
+            if (snapshot.data != null) {
+              if (snapshot.hasData) {
+                hasData = true;
+              }
+            }
+
+            if (hasData) {
+              var respMapped = ModelParser.getCorrect(snapshot.data.toString());
+              if (respMapped!.containsKey(ResponseEventType.MessageEvent)) {
+                var messageRespModel =
+                    respMapped[ResponseEventType.MessageEvent]
+                        as ModelMessageResp;
+                return Text(
+                    messageRespModel.sender + " : " + messageRespModel.message);
+              } else {
+                return Text("xxxxxx");
+              }
+            } else {
+              return Text(".....");
+            }
+          },
+          stream: Provider.of<MainProvider>(context, listen: false)
+              .getStream()!
+              .stream,
         ),
       ],
     ));

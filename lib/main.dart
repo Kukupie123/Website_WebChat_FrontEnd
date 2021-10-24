@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/material.dart';
 import 'package:ggez/Pages/chat/pagerealtimechat.dart';
 import 'package:ggez/Providers/mainprovider.dart';
@@ -20,7 +22,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: const PageRealTime(),
+        home:  PageRealTime(),
       ),
     );
   }
