@@ -28,6 +28,12 @@ class API {
         {"action": "join", "userName": name, 'roomNumber': roomNumber});
   }
 
+  static String getGetUsersInRoomRequest() {
+    return jsonEncode({
+      "action": "getConnectedUsers",
+    });
+  }
+
   static String getCreateSendMessageRequest(String message) {
     return jsonEncode({"action": "message", "message": message});
   }

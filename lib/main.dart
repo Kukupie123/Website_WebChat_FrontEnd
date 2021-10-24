@@ -27,3 +27,17 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
+
+/*
+{
+"action" : "createRoom",
+"userName" : "kuchuk1"
+}
+
+{
+"action":"join",
+"userName":"kuku",
+"roomNumber": 0
+}
+ */

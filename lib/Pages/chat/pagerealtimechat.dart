@@ -66,7 +66,7 @@ class _PageChatHomeState extends State<PageChatHome> {
                   }
                   return Text("Error loading");
                 }
-                //Checking if the response we ot is of JoinRoom
+                //Checking if the response we get is of JoinRoom
               } else if (resp.containsKey(ResponseEventType.JoinedRoomEvent)) {
                 if (resp[ResponseEventType.JoinedRoomEvent] != null) {
                   var responseModel = resp[ResponseEventType.JoinedRoomEvent]
@@ -80,6 +80,7 @@ class _PageChatHomeState extends State<PageChatHome> {
                   }
                   return Text("Error loading");
                 }
+                return Text("joined room model is null");
               }
               return Text(snapshot.data.toString());
             } else {

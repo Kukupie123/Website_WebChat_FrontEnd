@@ -42,6 +42,18 @@ class ModelMessageResp extends _ModelBaseResp {
   ModelMessageResp(this.message, this.sender, String event) : super(event);
 }
 
+class ModelGetUsersInRoomResp extends _ModelBaseResp {
+  final List<_GetUsersUserModel> usersList;
+
+  ModelGetUsersInRoomResp(this.usersList, String event) : super(event);
+}
+
+class _GetUsersUserModel {
+  final String userName;
+
+  _GetUsersUserModel(this.userName);
+}
+
 class ModelParser {
   static Map<ResponseEventType, _ModelBaseResp?>? getCorrect(String response) {
     try {
@@ -66,6 +78,22 @@ class ModelParser {
               data['status code'],
               data['event']);
           return {ResponseEventType.JoinedRoomEvent: _modelJoinedRoomResp};
+        case "getConnectedUsersEvent":
+          var users = data['users']; //list of users we get
+
+          //creating new user list
+          List<_GetUsersUserModel> tempUsers = [];
+          //iterating response list and making new object
+          for (var u in users) {
+            _GetUsersUserModel user = _GetUsersUserModel(u['userName']);
+            tempUsers.add(user);
+          }
+          //creating model object
+          ModelGetUsersInRoomResp modelGetUsersInRoomResp =
+              ModelGetUsersInRoomResp(tempUsers, data['event']);
+          return {
+            ResponseEventType.GetUsersInRoomEvent: modelGetUsersInRoomResp
+          };
       }
     } on Exception {
       return {ResponseEventType.Null: null};
@@ -73,4 +101,10 @@ class ModelParser {
   }
 }
 
-enum ResponseEventType { MessageEvent, CreateRoomEvent, JoinedRoomEvent, Null }
+enum ResponseEventType {
+  MessageEvent,
+  CreateRoomEvent,
+  JoinedRoomEvent,
+  GetUsersInRoomEvent,
+  Null
+}
