@@ -60,15 +60,25 @@ class _PageRealTimeState extends State<PageRealTime> {
                   userName = responseModel.userName;
                   _startNavigation();
                   return Text("Loading");
-                } else {
-                  return Text("Error loading");
                 }
-              } else {
-                return Text(snapshot.data.toString());
+                return Text("Error loading");
               }
-            } else {
-              return Text(snapshot.data.toString());
+              //Checking if the response we ot is of JoinRoom
+            } else if (resp!.containsKey(ResponseEventType.JoinedRoomEvent)) {
+              if (resp[ResponseEventType.JoinedRoomEvent] != null) {
+                var responseModel = resp[ResponseEventType.JoinedRoomEvent]
+                    as ModelJoinedRoomResp;
+
+                if (responseModel.statusCode == 200) {
+                  roomNumber = responseModel.roomNumber;
+                  userName = responseModel.userName;
+                  _startNavigation();
+                  return Text("Joining Room");
+                }
+                return Text("Error loading");
+              }
             }
+            return Text(snapshot.data.toString());
           } else {
             //MAIN VIEW WHEN WE ENTER
             return Column(
@@ -136,7 +146,7 @@ class _PageRealTimeState extends State<PageRealTime> {
   }
 
   _onJoinRoomPressed(String displayName, int roomNumber) {
-    if (displayName.isNotEmpty && roomNumber > 0) {
+    if (displayName.isNotEmpty && roomNumber >= 0) {
       Provider.of<MainProvider>(context, listen: false).sendData(
           API.getJoinRoomRequest(
               roomNumber: roomNumber, displayName: displayName));

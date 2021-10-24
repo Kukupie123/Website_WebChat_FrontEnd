@@ -25,6 +25,16 @@ class ModelCreateRoomResp extends _ModelBaseResp {
       : super(event);
 }
 
+class ModelJoinedRoomResp extends _ModelBaseResp {
+  final String userName;
+  final int roomNumber;
+  final int statusCode;
+
+  ModelJoinedRoomResp(
+      this.userName, this.roomNumber, this.statusCode, String event)
+      : super(event);
+}
+
 class ModelMessageResp extends _ModelBaseResp {
   final String message;
   final String sender;
@@ -50,7 +60,12 @@ class ModelParser {
               data["event"]);
           return {ResponseEventType.CreateRoomEvent: _modelCreateRoomResp};
         case "joinedRoomEvent":
-          return {ResponseEventType.Null: null};
+          ModelJoinedRoomResp _modelJoinedRoomResp = ModelJoinedRoomResp(
+              data['userName'],
+              data['roomNumber'],
+              data['status code'],
+              data['event']);
+          return {ResponseEventType.JoinedRoomEvent: _modelJoinedRoomResp};
       }
     } on Exception {
       return {ResponseEventType.Null: null};
