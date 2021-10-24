@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names
+
 /*
 Class Objective:
 A model of the responses we are going to get from the backend.

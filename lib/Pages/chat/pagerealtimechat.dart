@@ -18,7 +18,8 @@ class PageRealTime extends StatefulWidget {
 }
 
 class _PageRealTimeState extends State<PageRealTime> {
-  TextEditingController? displayname;
+  TextEditingController? displaynameController;
+  TextEditingController? roomNumberController;
 
   //to allow multi page stream we need to broadcast
 
@@ -29,7 +30,8 @@ class _PageRealTimeState extends State<PageRealTime> {
   @override
   void initState() {
     super.initState();
-    displayname = TextEditingController();
+    displaynameController = TextEditingController();
+    roomNumberController = TextEditingController();
     Provider.of<MainProvider>(context, listen: false).connect();
   }
 
@@ -43,9 +45,6 @@ class _PageRealTimeState extends State<PageRealTime> {
     return Scaffold(
       body: StreamBuilder(
         builder: (context, snapshot) {
-          bool hasData = false;
-          print(snapshot.data.toString());
-
           if (snapshot.hasData) {
             //sending the data to get parsed and send us a Map<event,ModelResponse> accordingly
             var resp = ModelParser.getCorrect(snapshot.data.toString());
@@ -71,12 +70,45 @@ class _PageRealTimeState extends State<PageRealTime> {
               return Text(snapshot.data.toString());
             }
           } else {
-            return TextButton(
-                onPressed: () {
-                  Provider.of<MainProvider>(context, listen: false).sendData(
-                      API.getCreateRoomRequest(displayName: "Kuchuk"));
-                },
-                child: Text("No data create now"));
+            //MAIN VIEW WHEN WE ENTER
+            return Column(
+              children: [
+                Row(
+                  children: [
+                    SizedBox(
+                      width: 300,
+                      child: TextField(
+                        controller: roomNumberController,
+                        decoration: InputDecoration(hintText: "Room number"),
+                        onChanged: (value) {
+                          try {
+                            int.parse(value);
+                          } on Exception {
+                            roomNumberController!.clear();
+                          }
+                        },
+                      ),
+                    ),
+                    SizedBox(
+                      width: 300,
+                      child: TextField(
+                        controller: displaynameController,
+                        decoration: InputDecoration(hintText: "Display name"),
+                      ),
+                    ),
+                  ],
+                ),
+                TextButton(
+                    onPressed: () => _onJoinRoomPressed(
+                        displaynameController!.text,
+                        int.parse(roomNumberController!.text)),
+                    child: Text("Join a room")),
+                TextButton(
+                    onPressed: () =>
+                        _onCreateRoomPressed(displaynameController!.text),
+                    child: Text("Create a new Room"))
+              ],
+            );
           }
         },
         stream: Provider.of<MainProvider>(context, listen: false)
@@ -94,5 +126,20 @@ class _PageRealTimeState extends State<PageRealTime> {
           builder: (context) => PageChatLobby(roomNumber, userName),
         ),
         (route) => false);
+  }
+
+  _onCreateRoomPressed(String displayName) {
+    if (displaynameController!.text.isNotEmpty) {
+      Provider.of<MainProvider>(context, listen: false)
+          .sendData(API.getCreateRoomRequest(displayName: displayName));
+    }
+  }
+
+  _onJoinRoomPressed(String displayName, int roomNumber) {
+    if (displayName.isNotEmpty && roomNumber > 0) {
+      Provider.of<MainProvider>(context, listen: false).sendData(
+          API.getJoinRoomRequest(
+              roomNumber: roomNumber, displayName: displayName));
+    }
   }
 }

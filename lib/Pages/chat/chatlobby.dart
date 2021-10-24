@@ -45,6 +45,12 @@ class _PageChatLobbyState extends State<PageChatLobby> {
             }),
           ),
         ),
+        Row(
+          children: [
+            Text("Room Number : " + widget.roomNumber.toString()),
+            Text("Display Name : " + widget.userName.toString())
+          ],
+        ),
         TextFormField(
           controller: messageTC,
           decoration: InputDecoration(hintText: "Message"),
