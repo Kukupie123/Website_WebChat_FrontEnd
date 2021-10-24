@@ -82,6 +82,8 @@ class _PageChatHomeState extends State<PageChatHome> {
                 }
                 return Text("joined room model is null");
               }
+
+              //If none of the response is what we want we are going to show the data itself
               return Text(snapshot.data.toString());
             } else {
               //MAIN VIEW WHEN WE ENTER
