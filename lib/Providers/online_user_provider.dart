@@ -6,7 +6,7 @@ class OnlineUserProvider with ChangeNotifier {
   List<String> _joinedUsers = [];
 
   Map<String, String> _usersTexting = <String, String>{}; //username,text
-
+//adds new text
   void addNewText(String userName, String message) async {
     if (_usersTexting.containsKey(userName)) {
       _usersTexting[userName] = message;
