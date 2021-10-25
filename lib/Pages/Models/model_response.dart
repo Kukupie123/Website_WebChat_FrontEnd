@@ -55,7 +55,8 @@ class _GetUsersUserModel {
 }
 
 class ModelParser {
-  static Map<ResponseEventType, _ModelBaseResp?>? getCorrect(String response) {
+  static Map<ResponseEventType, _ModelBaseResp?>? getCorrectResponseModel(
+      String response) {
     try {
       var data = jsonDecode(response);
       String eventType = data['event'];
@@ -80,7 +81,6 @@ class ModelParser {
           return {ResponseEventType.JoinedRoomEvent: _modelJoinedRoomResp};
         case "getConnectedUsersEvent":
           var users = data['users']; //list of users we get
-
           //creating new user list
           List<_GetUsersUserModel> tempUsers = [];
           //iterating response list and making new object
@@ -95,6 +95,7 @@ class ModelParser {
             ResponseEventType.GetUsersInRoomEvent: modelGetUsersInRoomResp
           };
       }
+      return {ResponseEventType.Null: null};
     } on Exception {
       return {ResponseEventType.Null: null};
     }

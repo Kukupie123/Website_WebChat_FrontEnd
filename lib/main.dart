@@ -40,4 +40,8 @@ class MyApp extends StatelessWidget {
 "userName":"kuku",
 "roomNumber": 0
 }
+
+{
+"action": "getConnectedUsers"
+}
  */

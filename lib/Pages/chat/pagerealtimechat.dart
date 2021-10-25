@@ -50,7 +50,7 @@ class _PageChatHomeState extends State<PageChatHome> {
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               //sending the data to get parsed and send us a Map<event,ModelResponse> accordingly
-              var resp = ModelParser.getCorrect(snapshot.data.toString());
+              var resp = ModelParser.getCorrectResponseModel(snapshot.data.toString());
 
               //Checking if the response we got is of CreateRoomEvent
               if (resp!.containsKey(ResponseEventType.CreateRoomEvent)) {
@@ -169,14 +169,9 @@ class _PageChatHomeState extends State<PageChatHome> {
                                   displaynameController!.text,
                                   int.parse(roomNumberController!.text)),
                               title: "Join a room")),
-                      GredientButton(
+                      DarkButtton(
                         onPressed: () =>
                             _onCreateRoomPressed(displaynameController!.text),
-                        splashColor: Colors.orange,
-                        colors: [
-                          Colors.red,
-                          Colors.orange,
-                        ],
                         title: "Create Room",
                       ),
                     ],

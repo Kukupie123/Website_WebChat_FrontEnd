@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:ggez/Pages/API/api.dart';
 import 'package:ggez/Pages/Models/model_response.dart';
 import 'package:ggez/Providers/mainprovider.dart';
+import 'package:ggez/Providers/online_user_provider.dart';
 import 'package:ggez/Widgets/background/animated_background.dart';
 import 'package:provider/provider.dart';
 
@@ -20,107 +21,120 @@ class PageChatLobby extends StatefulWidget {
 class _PageChatLobbyState extends State<PageChatLobby> {
   TextEditingController? messageTC;
 
-  List<String> joinedUsers = [];
+  List<String> texters = [];
 
   @override
   void initState() {
     super.initState();
     messageTC = TextEditingController();
+    _getConnectedUsers();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: GradientAnimated(
-        child: Column(
-          children: [
-            Text("Users online :"),
-            SingleChildScrollView(
-              child: Row(
-                children: List.generate(joinedUsers.length, (i) {
-                  return Row(children: [
-                    Icon(Icons.person),
-                    Text(joinedUsers[i] + ", ")
-                  ]);
-                }),
+    return ChangeNotifierProvider(
+      create: (context) => OnlineUserProvider(),
+      builder: (context, child) => Scaffold(
+        body: GradientAnimated(
+          child: Column(
+            children: [
+              Text("Users in Room : "),
+              Consumer<OnlineUserProvider>(
+                builder: (context, value, child) => SingleChildScrollView(
+                  child: Row(
+                    children:
+                        List.generate(value.getUserList().length, (index) {
+                      return Row(
+                        children: [
+                          Icon(Icons.person),
+                          Text("  " + value.getUserList()[index])
+                        ],
+                      );
+                    }),
+                  ),
+                ),
               ),
-            ),
-            Row(
-              children: [
-                Text("Room Number : " + widget.roomNumber.toString()),
-                Text("Display Name : " + widget.userName.toString())
-              ],
-            ),
-            TextFormField(
-              controller: messageTC,
-              decoration: InputDecoration(hintText: "Message"),
-              onChanged: (value) {
-                Provider.of<MainProvider>(context, listen: false)
-                    .sendData(API.getCreateSendMessageRequest(messageTC!.text));
-              },
-            ),
-            StreamBuilder(
-              builder: (context, snapshot) {
-                bool hasData = false;
-                if (snapshot.data != null) {
-                  if (snapshot.hasData) {
-                    hasData = true;
+              Row(
+                children: [
+                  Text("Room Number : " + widget.roomNumber.toString()),
+                  Text("Display Name : " + widget.userName.toString())
+                ],
+              ),
+              TextFormField(
+                controller: messageTC,
+                decoration: InputDecoration(hintText: "Message"),
+                onChanged: (value) {
+                  Provider.of<MainProvider>(context, listen: false).sendData(
+                      API.getCreateSendMessageRequest(messageTC!.text));
+                },
+              ),
+              StreamBuilder(
+                builder: (context, snapshot) {
+                  bool hasData = false;
+                  if (snapshot.data != null) {
+                    if (snapshot.hasData) {
+                      hasData = true;
+                    }
                   }
-                }
 
-                if (hasData) {
-                  var respMapped =
-                      ModelParser.getCorrect(snapshot.data.toString());
+                  if (hasData) {
+                    var respMapped = ModelParser.getCorrectResponseModel(
+                        snapshot.data.toString());
 
-                  //Message received event
-                  if (respMapped!.containsKey(ResponseEventType.MessageEvent)) {
-                    if (respMapped[ResponseEventType.MessageEvent] != null) {
-                      var messageRespModel =
-                          respMapped[ResponseEventType.MessageEvent]
-                              as ModelMessageResp;
-                      return Text(messageRespModel.sender +
-                          " : " +
-                          messageRespModel.message);
-                    }
-                    return Text("xxxxx");
-                  } else if (respMapped
-                      .containsKey(ResponseEventType.JoinedRoomEvent)) {
-                    if (respMapped[ResponseEventType.JoinedRoomEvent] != null) {
-                      _getConnectedUsers();
-                    }
-                    return Text("xxxxx");
-                  } else if (respMapped
-                      .containsKey(ResponseEventType.GetUsersInRoomEvent)) {
-                    if (respMapped[ResponseEventType.JoinedRoomEvent] != null) {
-                      ModelGetUsersInRoomResp modelJoinedResp =
-                          respMapped[ResponseEventType.JoinedRoomEvent]
-                              as ModelGetUsersInRoomResp;
-
-                      joinedUsers.clear();
-
-                      for (var user in modelJoinedResp.usersList) {
-                        joinedUsers.add(user.userName);
+                    //Message received event
+                    if (respMapped!
+                        .containsKey(ResponseEventType.MessageEvent)) {
+                      if (respMapped[ResponseEventType.MessageEvent] != null) {
+                        var messageRespModel =
+                            respMapped[ResponseEventType.MessageEvent]
+                                as ModelMessageResp;
+                        return Text(messageRespModel.sender +
+                            " : " +
+                            messageRespModel.message);
                       }
+                      //Joined Room event
+                    } else if (respMapped
+                        .containsKey(ResponseEventType.JoinedRoomEvent)) {
+                      if (respMapped[ResponseEventType.JoinedRoomEvent] !=
+                          null) {
+                        _getConnectedUsers();
+                      }
+                      //GetConnectedUsers event
+                    } else if (respMapped
+                        .containsKey(ResponseEventType.GetUsersInRoomEvent)) {
+                      if (respMapped[ResponseEventType.GetUsersInRoomEvent] !=
+                          null) {
+                        ModelGetUsersInRoomResp modelJoinedResp =
+                            respMapped[ResponseEventType.GetUsersInRoomEvent]
+                                as ModelGetUsersInRoomResp;
 
-                      setState(() {});
-                    } else
-                      return Text("xxxxx");
-                  } else
-                    return Text("Stoxx");
-                }
-                return Text(":)");
-              },
-              stream: Provider.of<MainProvider>(context, listen: false)
-                  .getStream()!
-                  .stream,
-            ),
-          ],
+                        List<String> tempUserNames = [];
+
+                        for (var user in modelJoinedResp.usersList) {
+                          tempUserNames.add(user.userName);
+                        }
+
+                        print(tempUserNames.toString());
+
+                        Provider.of<OnlineUserProvider>(context, listen: false)
+                            .setUsers(tempUserNames);
+                      }
+                    }
+                  }
+                  return Text(":)");
+                },
+                stream: Provider.of<MainProvider>(context, listen: false)
+                    .getStream()!
+                    .stream,
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  _getConnectedUsers() {
+  _getConnectedUsers() async {
     Provider.of<MainProvider>(context, listen: false)
         .sendData(API.getGetUsersInRoomRequest());
   }
