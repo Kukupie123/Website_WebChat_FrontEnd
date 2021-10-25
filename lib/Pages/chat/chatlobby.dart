@@ -21,8 +21,6 @@ class PageChatLobby extends StatefulWidget {
 class _PageChatLobbyState extends State<PageChatLobby> {
   TextEditingController? messageTC;
 
-  List<String> texters = [];
-
   @override
   void initState() {
     super.initState();
@@ -88,9 +86,25 @@ class _PageChatLobbyState extends State<PageChatLobby> {
                         var messageRespModel =
                             respMapped[ResponseEventType.MessageEvent]
                                 as ModelMessageResp;
-                        return Text(messageRespModel.sender +
-                            " : " +
-                            messageRespModel.message);
+
+                        Provider.of<OnlineUserProvider>(context, listen: false)
+                            .addNewText(messageRespModel.sender,
+                                messageRespModel.message);
+
+                        List<String> text = [];
+                        Provider.of<OnlineUserProvider>(context, listen: false)
+                            .getUsersTexting().forEach((key, value) {
+                          text.add(key + " : " + value);
+                        });
+
+                        return SizedBox(
+                          height: 200,
+                          width: 500,
+                          child:ListView(
+                            children:
+                            List.generate(text.length, (index) => Text(text[index])),
+                          ),);
+
                       }
                       //Joined Room event
                     } else if (respMapped
@@ -114,8 +128,6 @@ class _PageChatLobbyState extends State<PageChatLobby> {
                           tempUserNames.add(user.userName);
                         }
 
-                        print(tempUserNames.toString());
-
                         Provider.of<OnlineUserProvider>(context, listen: false)
                             .setUsers(tempUserNames);
                       }
@@ -127,6 +139,7 @@ class _PageChatLobbyState extends State<PageChatLobby> {
                     .getStream()!
                     .stream,
               ),
+
             ],
           ),
         ),
