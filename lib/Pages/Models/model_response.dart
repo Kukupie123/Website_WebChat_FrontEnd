@@ -100,6 +100,41 @@ class ModelParser {
       return {ResponseEventType.Null: null};
     }
   }
+
+  static bool isModelValid(
+      ResponseEventType responseEventType, String response) {
+    var data = jsonDecode(response); //parsed data
+    switch (responseEventType) {
+      case ResponseEventType.MessageEvent:
+        if ((data['message'] as String).isNotEmpty &&
+            (data['senderName'] as String).isNotEmpty) {
+          return true;
+        } else {
+          return false;
+        }
+
+      case ResponseEventType.CreateRoomEvent:
+        if (data['status code'] == 200) {
+          return true;
+        } else {
+          return false;
+        }
+
+      case ResponseEventType.JoinedRoomEvent:
+        if (data['status code'] == 200) {
+          return true;
+        } else {
+          return false;
+        }
+      case ResponseEventType.GetUsersInRoomEvent:
+        if (data['getConnectedUsersEvent'] == "getConnectedUsersEvent") {
+          return true;
+        } else {
+          return false;
+        }
+    }
+    return false;
+  }
 }
 
 enum ResponseEventType {

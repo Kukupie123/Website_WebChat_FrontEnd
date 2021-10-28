@@ -11,8 +11,9 @@ import 'package:provider/provider.dart';
 class PageChatLobby extends StatefulWidget {
   PageChatLobby(this.roomNumber, this.userName);
 
-  final int roomNumber;
-  final String userName;
+
+  final int roomNumber; //The room number of the user
+  final String userName; //The username of the user
 
   @override
   _PageChatLobbyState createState() => _PageChatLobbyState();
@@ -93,18 +94,19 @@ class _PageChatLobbyState extends State<PageChatLobby> {
 
                         List<String> text = [];
                         Provider.of<OnlineUserProvider>(context, listen: false)
-                            .getUsersTexting().forEach((key, value) {
+                            .getUsersTexting()
+                            .forEach((key, value) {
                           text.add(key + " : " + value);
                         });
 
                         return SizedBox(
                           height: 200,
                           width: 500,
-                          child:ListView(
-                            children:
-                            List.generate(text.length, (index) => Text(text[index])),
-                          ),);
-
+                          child: ListView(
+                            children: List.generate(
+                                text.length, (index) => Text(text[index])),
+                          ),
+                        );
                       }
                       //Joined Room event
                     } else if (respMapped
@@ -139,7 +141,6 @@ class _PageChatLobbyState extends State<PageChatLobby> {
                     .getStream()!
                     .stream,
               ),
-
             ],
           ),
         ),
@@ -147,6 +148,7 @@ class _PageChatLobbyState extends State<PageChatLobby> {
     );
   }
 
+  ///Sends a req to backend to get connected user
   _getConnectedUsers() async {
     Provider.of<MainProvider>(context, listen: false)
         .sendData(API.getGetUsersInRoomRequest());

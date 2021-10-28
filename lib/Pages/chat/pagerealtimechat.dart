@@ -23,11 +23,8 @@ class _PageChatHomeState extends State<PageChatHome> {
   TextEditingController? displaynameController;
   TextEditingController? roomNumberController;
 
-  //for navigation
-  var roomNumber = -1;
-  String userName = '';
-
-  //animation
+  var roomNumber = -1; //Created or Joined room number
+  String userName = ''; //Created user name
 
   @override
   void initState() {
@@ -50,7 +47,8 @@ class _PageChatHomeState extends State<PageChatHome> {
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               //sending the data to get parsed and send us a Map<event,ModelResponse> accordingly
-              var resp = ModelParser.getCorrectResponseModel(snapshot.data.toString());
+              var resp =
+                  ModelParser.getCorrectResponseModel(snapshot.data.toString());
 
               //Checking if the response we got is of CreateRoomEvent
               if (resp!.containsKey(ResponseEventType.CreateRoomEvent)) {
@@ -58,7 +56,9 @@ class _PageChatHomeState extends State<PageChatHome> {
                   var responseModel = resp[ResponseEventType.CreateRoomEvent]
                       as ModelCreateRoomResp;
 
-                  if (responseModel.statusCode == 200) {
+                  if (ModelParser.isModelValid(
+                      ResponseEventType.CreateRoomEvent,
+                      snapshot.data.toString())) {
                     roomNumber = responseModel.roomNumber;
                     userName = responseModel.userName;
                     _startNavigation();
