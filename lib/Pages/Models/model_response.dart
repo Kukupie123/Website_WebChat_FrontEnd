@@ -15,6 +15,16 @@ class _ModelBaseResp {
   _ModelBaseResp(this.event);
 }
 
+class ModelDisconnected extends _ModelBaseResp {
+  final String userName;
+  final int roomNumber;
+  final int statusCode;
+
+  ModelDisconnected(
+      this.userName, this.roomNumber, this.statusCode, String event)
+      : super(event);
+}
+
 class ModelCreateRoomResp extends _ModelBaseResp {
   final String userName;
   final int roomNumber;
@@ -79,6 +89,15 @@ class ModelParser {
               data['status code'],
               data['event']);
           return {ResponseEventType.JoinedRoomEvent: _modelJoinedRoomResp};
+
+        case "disconnectedEvent":
+          ModelDisconnected modelDisconnected = ModelDisconnected(
+              data['userName'],
+              data['roomNumber'],
+              data['status code'],
+              data['event']);
+
+          return {ResponseEventType.DisconnectedRoom: modelDisconnected};
         case "getConnectedUsersEvent":
           var users = data['users']; //list of users we get
           //creating new user list
@@ -132,6 +151,13 @@ class ModelParser {
         } else {
           return false;
         }
+
+      case ResponseEventType.DisconnectedRoom:
+        if (data['status code'] == 200) {
+          return true;
+        } else {
+          return false;
+        }
     }
     return false;
   }
@@ -141,6 +167,7 @@ enum ResponseEventType {
   MessageEvent,
   CreateRoomEvent,
   JoinedRoomEvent,
+  DisconnectedRoom,
   GetUsersInRoomEvent,
   Null
 }

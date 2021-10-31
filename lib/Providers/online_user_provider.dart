@@ -30,4 +30,9 @@ class OnlineUserProvider with ChangeNotifier {
   List<String> getUserList() {
     return _joinedUsers;
   }
+
+  void removeUser(String userName) {
+    _usersTexting.remove(userName);
+    notifyListeners();
+  }
 }

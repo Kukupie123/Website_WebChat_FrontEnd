@@ -11,7 +11,6 @@ import 'package:provider/provider.dart';
 class PageChatLobby extends StatefulWidget {
   PageChatLobby(this.roomNumber, this.userName);
 
-
   final int roomNumber; //The room number of the user
   final String userName; //The username of the user
 
@@ -56,7 +55,7 @@ class _PageChatLobbyState extends State<PageChatLobby> {
               Row(
                 children: [
                   Text("Room Number : " + widget.roomNumber.toString()),
-                  Text("Display Name : " + widget.userName.toString())
+                  Text(" Display Name : " + widget.userName.toString())
                 ],
               ),
               TextFormField(
@@ -132,6 +131,18 @@ class _PageChatLobbyState extends State<PageChatLobby> {
 
                         Provider.of<OnlineUserProvider>(context, listen: false)
                             .setUsers(tempUserNames);
+                      }
+                    } else if (respMapped
+                        .containsKey(ResponseEventType.DisconnectedRoom)) {
+                      if (ModelParser.isModelValid(
+                          ResponseEventType.DisconnectedRoom,
+                          snapshot.data.toString())) {
+                        ModelDisconnected modelDisconnected =
+                            respMapped[ResponseEventType.DisconnectedRoom]
+                                as ModelDisconnected;
+
+                        Provider.of<OnlineUserProvider>(context, listen: false)
+                            .removeUser(modelDisconnected.userName);
                       }
                     }
                   }
